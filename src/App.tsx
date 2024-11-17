@@ -6,7 +6,7 @@ import GameArea from "./components/GameArea";
 export default function App() {
   return (
     <Provider store={store}>
-      <div className="min-h-screen items-center justify-center bg-muted max-w-[1000px] mx-auto border-2 p-10">
+      <div className="min-h-screen items-center justify-center bg-muted max-w-[1000px] mx-auto border-2 md:p-10 p-2">
         <ControllGame></ControllGame>
         <GameArea></GameArea>
       </div>

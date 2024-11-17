@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { generateInitialPoints } from "../helper/generateInititalPoints";
 import { GameState, Point } from "../types/type";
 import { GameStatus, Level } from "../types/enum";
+import intervalManager from "../helper/InervalManager";
 
 const gameSlice = createSlice({
     name: "game",
@@ -22,6 +23,11 @@ const gameSlice = createSlice({
 
             state.level = action.payload;
         },
+        newGame: (state) => {
+            state.points = generateInitialPoints(0);
+            state.gameStatus = GameStatus.paused;
+            state.level = Level.easy;
+        },
         removePoint: (state, action: PayloadAction<number>) => {
 
             const pointToRemove = state.points.find(
@@ -31,7 +37,7 @@ const gameSlice = createSlice({
                 pointToRemove.bgColor = "bg-red-500";
             }
             if (pointToRemove && pointToRemove.number === state.nextExpectedNumber) {
-                
+
                 // state.points = state.points.filter(
                 //     (point) => point.id !== action.payload
                 // );
@@ -48,27 +54,27 @@ const gameSlice = createSlice({
             }
         },
         movePoints: (state) => {
+            console.log("movePoints");
+
             if (state.gameStatus === GameStatus.lost) return;
 
             state.points = state.points.map((point) => {
-                let deltaX = (Math.random() - 0.5) * 2; // Random movement for x
-                let deltaY = (Math.random() - 0.5) * 2; // Random movement for y
 
                 return {
                     ...point,
-                    x: Math.min(95, Math.max(3, point.x + deltaX)), // Clamp x to [3, 95]
-                    y: Math.min(93, Math.max(8, point.y + deltaY)), // Clamp y to [8, 93]
+                    x: Math.random() * 92 + 3,
+                    y: Math.random() * 85 + 8,
                 };
             });
         },
 
 
         updateOpacityAndTime: (state, action: PayloadAction<{ id: number, intervalId: any }>) => {
-
             if (state.gameStatus === GameStatus.lost) {
                 clearInterval(action.payload.intervalId);
                 return;
             };
+            intervalManager.add(action.payload.intervalId);
 
             // Tạo một bản sao của mảng state.points
             const updatedPoints = state.points.map((point) => {
@@ -93,6 +99,7 @@ const gameSlice = createSlice({
 
             if (point?.opacity === 0) {
                 clearInterval(action.payload.intervalId);
+                intervalManager.remove(action.payload.intervalId);
                 return;
             }
         },
@@ -115,6 +122,6 @@ const gameSlice = createSlice({
     },
 });
 
-export const { toggleAutoPlay, setLevel, movePoints, resetGame, startGame, setNumber, setPoints, removePoint, updateOpacityAndTime } = gameSlice.actions;
+export const { toggleAutoPlay, setLevel, newGame, movePoints, resetGame, startGame, setNumber, setPoints, removePoint, updateOpacityAndTime } = gameSlice.actions;
 
 export default gameSlice.reducer;

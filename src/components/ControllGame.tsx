@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GameState } from "../types/type";
 import {
+  newGame,
   removePoint,
   resetGame,
   setLevel,
@@ -12,13 +13,22 @@ import {
 } from "../redux/gamePlaySlice";
 import { GameStatus, Level } from "../types/enum";
 import { AppDispatch } from "../redux/store";
+import intervalManager from "../helper/InervalManager";
 
 export default function ControllGame() {
-  const [numberInput, setNumberInput] = useState(0);
   const { points, isAutoPlay, gameStatus, nextExpectedNumber, level } =
     useSelector((state: { game: GameState }) => state.game);
   const [time, setTime] = useState(0);
+  const [numberInput, setNumberInput] = useState(5);
   const dispatch = useDispatch<AppDispatch>();
+
+  const handleNewGame = () => {
+    dispatch(resetGame());
+    dispatch(newGame());
+    intervalManager.clearAll();
+    setTime(0);
+  };
+
   const handleResetGame = () => {
     if (numberInput < 1) {
       alert("Please set number first");
@@ -27,6 +37,7 @@ export default function ControllGame() {
     setTime(0);
     dispatch(setNumber(numberInput));
     dispatch(resetGame());
+    intervalManager.clearAll();
   };
   const handleStartGame = () => {
     if (numberInput < 1) {
@@ -48,31 +59,55 @@ export default function ControllGame() {
 
   useEffect(() => {
     if (isAutoPlay && points.length > 0 && gameStatus === GameStatus.playing) {
-      const intervalId = setInterval(() => {
+      console.log("Auto play started");
+
+      const intervalId1 = setInterval(() => {
         if (gameStatus === GameStatus.lost) return;
+
         const targetPoint = points.find(
           (point) => point.number === nextExpectedNumber
         );
+
         if (targetPoint) {
           dispatch(removePoint(targetPoint.id));
+
           const intervalId = setInterval(() => {
-            // Dispatch action để cập nhật opacity và time
             dispatch(
               updateOpacityAndTime({
                 id: targetPoint.id,
-                intervalId: intervalId,
+                intervalId,
               })
             );
           }, 100);
-        }
-      }, 500);
 
-      return () => clearInterval(intervalId);
+          intervalManager.add(intervalId);
+        }
+      }, 1000);
+
+      intervalManager.add(intervalId1);
+
+      return () => {
+        clearInterval(intervalId1);
+        intervalManager.remove(intervalId1);
+      };
     }
-  }, [isAutoPlay, points, dispatch, nextExpectedNumber, gameStatus]);
+    return () => {
+      intervalManager.clearAll();
+    };
+  }, [isAutoPlay, nextExpectedNumber]);
   return (
     <div className="flex justify-between items-center mb-4">
       <div className="space-y-2">
+        {gameStatus === GameStatus.playing && (
+          <div>
+            <button
+              onClick={handleNewGame}
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            >
+              New Game
+            </button>
+          </div>
+        )}
         <div className="font-bold">
           {(gameStatus == GameStatus.paused ||
             gameStatus == GameStatus.playing) && <p>LET'S PLAY</p>}

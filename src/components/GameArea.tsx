@@ -21,19 +21,20 @@ export default function GameArea() {
 
     dispatch(removePoint(point.id));
 
-    const intervalId = setInterval(() => {
-      // Dispatch action để cập nhật opacity và time
-      dispatch(updateOpacityAndTime({ id: point.id, intervalId: intervalId }));
+    const clikcUpdateInterval = setInterval(() => {
+      dispatch(
+        updateOpacityAndTime({ id: point.id, intervalId: clikcUpdateInterval })
+      );
     }, 100);
   };
 
   useEffect(() => {
     console.log(level);
-    
+
     if (gameStatus === "playing" && level !== Level.easy) {
       const intervalId = setInterval(() => {
         dispatch(movePoints());
-      }, 100);
+      }, 2000);
 
       return () => clearInterval(intervalId);
     }
@@ -42,7 +43,7 @@ export default function GameArea() {
   return (
     <div
       ref={gameAreaRef}
-      className="relative w-full min-h-[400px] border border-black rounded-lg cursor-pointer"
+      className="relative w-full min-h-[600px] border border-black rounded-lg cursor-pointer"
     >
       {/* Points */}
       {points.map((point) => (
@@ -61,8 +62,8 @@ export default function GameArea() {
           }}
         >
           {point.number}
-          <span className="absolute bottom-0 right-1/2 translate-x-1/2 text-sm text-white">
-            {point.time.toFixed(1)}
+          <span className="absolute bottom-0 right-1/2 translate-x-1/2 text-[10px] text-white">
+            {point.time.toFixed(1)}s
           </span>
         </div>
       ))}
