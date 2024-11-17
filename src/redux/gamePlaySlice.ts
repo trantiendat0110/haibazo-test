@@ -74,7 +74,6 @@ const gameSlice = createSlice({
                 clearInterval(action.payload.intervalId);
                 return;
             };
-            intervalManager.add(action.payload.intervalId);
 
             // Tạo một bản sao của mảng state.points
             const updatedPoints = state.points.map((point) => {
@@ -103,7 +102,6 @@ const gameSlice = createSlice({
                 return;
             }
         },
-
         toggleAutoPlay: (state) => {
             state.isAutoPlay = !state.isAutoPlay;
         },

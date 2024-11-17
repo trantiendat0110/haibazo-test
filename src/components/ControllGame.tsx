@@ -59,8 +59,6 @@ export default function ControllGame() {
 
   useEffect(() => {
     if (isAutoPlay && points.length > 0 && gameStatus === GameStatus.playing) {
-      console.log("Auto play started");
-
       const intervalId1 = setInterval(() => {
         if (gameStatus === GameStatus.lost) return;
 
@@ -79,8 +77,6 @@ export default function ControllGame() {
               })
             );
           }, 100);
-
-          intervalManager.add(intervalId);
         }
       }, 1000);
 
