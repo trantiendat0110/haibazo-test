@@ -27,6 +27,7 @@ const gameSlice = createSlice({
             state.points = generateInitialPoints(0);
             state.gameStatus = GameStatus.paused;
             state.level = Level.easy;
+            state.isAutoPlay = false;
         },
         removePoint: (state, action: PayloadAction<number>) => {
 
