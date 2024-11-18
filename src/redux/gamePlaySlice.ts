@@ -28,6 +28,7 @@ const gameSlice = createSlice({
             state.gameStatus = GameStatus.paused;
             state.level = Level.easy;
             state.isAutoPlay = false;
+            intervalManager.clearAll();
         },
         removePoint: (state, action: PayloadAction<number>) => {
 
@@ -43,9 +44,6 @@ const gameSlice = createSlice({
                 //     (point) => point.id !== action.payload
                 // );
                 state.nextExpectedNumber += 1;
-                if (state.points.length === 0) {
-                    state.gameStatus = GameStatus.cleared;
-                }
             } else {
                 state.gameStatus = GameStatus.lost;
 

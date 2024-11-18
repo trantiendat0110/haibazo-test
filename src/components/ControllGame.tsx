@@ -20,6 +20,7 @@ export default function ControllGame() {
     useSelector((state: { game: GameState }) => state.game);
   const [time, setTime] = useState(0);
   const [numberInput, setNumberInput] = useState(5);
+  const [gameStatusText, setGameStatusText] = useState<JSX.Element>();
   const dispatch = useDispatch<AppDispatch>();
 
   const handleNewGame = () => {
@@ -91,10 +92,23 @@ export default function ControllGame() {
       intervalManager.clearAll();
     };
   }, [isAutoPlay, nextExpectedNumber]);
+
+  useEffect(() => {
+    if (gameStatus === GameStatus.cleared) {
+      setTimeout(() => {
+        setGameStatusText(<div className="text-green-500">ALL CLEARED</div>);
+      }, 3000);
+    } else if (gameStatus === GameStatus.lost) {
+      setGameStatusText(<div className="text-red-500">GAME OVER</div>);
+    } else {
+      setGameStatusText(<div>LET'S PLAY</div>);
+    }
+  }, [gameStatus]);
   return (
     <div className="flex justify-between items-center mb-4">
       <div className="space-y-2">
-        {gameStatus === GameStatus.playing && (
+        {gameStatus === GameStatus.playing ||
+        gameStatus === GameStatus.cleared ? (
           <div>
             <button
               onClick={handleNewGame}
@@ -103,15 +117,10 @@ export default function ControllGame() {
               New Game
             </button>
           </div>
+        ) : (
+          ""
         )}
-        <div className="font-bold">
-          {(gameStatus == GameStatus.paused ||
-            gameStatus == GameStatus.playing) && <p>LET'S PLAY</p>}
-          {gameStatus == GameStatus.cleared && (
-            <p className="text-green-500">ALL CLEARED</p>
-          )}
-          {gameStatus == "lost" && <p className="text-red-500">GAME OVER</p>}
-        </div>
+        <div className="font-bold">{gameStatusText}</div>
         <div>
           Points:{" "}
           <input
