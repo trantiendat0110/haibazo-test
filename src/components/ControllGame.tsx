@@ -108,6 +108,7 @@ export default function ControllGame() {
     <div className="flex justify-between items-center mb-4">
       <div className="space-y-2">
         {gameStatus === GameStatus.playing ||
+        gameStatus === GameStatus.lost ||
         gameStatus === GameStatus.cleared ? (
           <div>
             <button
